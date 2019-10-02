@@ -4,21 +4,20 @@ import java.io.*;
 import java.util.*; 
 import java.net.*; 
 
-// ClientHandler class 
+// Clase Manejador de cliente 
 class ClientHandler implements Runnable  
 { 
     Scanner scn = new Scanner(System.in); 
     private String name; 
-    final DataInputStream dis; 
-    final DataOutputStream dos; 
+    final DataInputStream inStream; 
+    final DataOutputStream outStream; 
     Socket s; 
     boolean isloggedin; 
       
     // constructor 
-    public ClientHandler(Socket s, String name, 
-                            DataInputStream dis, DataOutputStream dos) { 
-        this.dis = dis; 
-        this.dos = dos; 
+    public ClientHandler(Socket s, String name, DataInputStream inStream, DataOutputStream outStream) { 
+        this.inStream = inStream; 
+        this.outStream = outStream; 
         this.name = name; 
         this.s = s; 
         this.isloggedin=true; 
@@ -32,31 +31,30 @@ class ClientHandler implements Runnable
         { 
             try
             { 
-                // receive the string 
-                received = dis.readUTF(); 
+                // Recibe el string
+                received = inStream.readUTF(); 
                   
                 System.out.println(received); 
                   
-                if(received.equals("logout")){ 
+                if(received.equals("Salir")){ 
                     this.isloggedin=false; 
                     this.s.close(); 
                     break; 
                 } 
                   
-                // break the string into message and recipient part 
+                // Rompe el string en dos partes, mensaje y receptor
                 StringTokenizer st = new StringTokenizer(received, "#"); 
                 String MsgToSend = st.nextToken(); 
                 String recipient = st.nextToken(); 
   
-                // search for the recipient in the connected devices list. 
-                // ar is the vector storing client of active users 
+                // Buscar el receptor dentro de los usuarios activos
+                // ar es el vector donde se guardan los usuarios activos
                 for (ClientHandler mc : Server.ar)  
                 { 
-                    // if the recipient is found, write on its 
-                    // output stream 
+                    // si el receptor es encontrado y está conectado, se escribe en su flujo de salida
                     if (mc.name.equals(recipient) && mc.isloggedin==true)  
                     { 
-                        mc.dos.writeUTF(this.name+" : "+MsgToSend); 
+                        mc.outStream.writeUTF(this.name+" : "+MsgToSend); 
                         break; 
                     } 
                 } 
@@ -68,9 +66,9 @@ class ClientHandler implements Runnable
         } 
         try
         { 
-            // closing resources 
-            this.dis.close(); 
-            this.dos.close(); 
+            // Cerrando los recursos
+            this.inStream.close(); 
+            this.outStream.close(); 
               
         }catch(IOException e){ 
             e.printStackTrace(); 

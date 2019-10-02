@@ -1,7 +1,6 @@
 package sockets;
 
-// Java implementation for multithreaded chat client 
-// Save file as Client.java 
+//Lado del Cliente
 
 import java.io.*; 
 import java.net.*; 
@@ -9,35 +8,35 @@ import java.util.Scanner;
 
 public class Client 
 { 
-	final static int ServerPort = 1234; 
+	final static int portServer = 1234; 
 
 	public static void main(String args[]) throws UnknownHostException, IOException 
 	{ 
 		Scanner scn = new Scanner(System.in); 
 		
-		// getting localhost ip 
-		InetAddress ip = InetAddress.getByName("localhost"); 
+		// Obteniendo la ip (en este ejemplo, se obtiene la ip de localhost - CAMBIAR -)
+		InetAddress ipServer = InetAddress.getByName("localhost"); 
 		
-		// establish the connection 
-		Socket s = new Socket(ip, ServerPort); 
+		// Estableciendo la conexión
+		Socket s = new Socket(ipServer, portServer); 
 		
-		// obtaining input and out streams 
-		DataInputStream dis = new DataInputStream(s.getInputStream()); 
-		DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+		// Se declaran los flujos de entrada y salida
+		DataInputStream inStream = new DataInputStream(s.getInputStream()); 
+		DataOutputStream outStream = new DataOutputStream(s.getOutputStream()); 
 
-		// sendMessage thread 
+		// Hilo para enviar mensajes
 		Thread sendMessage = new Thread(new Runnable() 
 		{ 
 			@Override
 			public void run() { 
 				while (true) { 
 
-					// read the message to deliver. 
-					String msg = scn.nextLine(); 
+					// Leer el mensaje a entregar por consola
+					String message = scn.nextLine(); 
 					
 					try { 
-						// write on the output stream 
-						dos.writeUTF(msg); 
+						// escribe en el flujo de salida el mensaje
+						outStream.writeUTF(message); 
 					} catch (IOException e) { 
 						e.printStackTrace(); 
 					} 
@@ -45,7 +44,7 @@ public class Client
 			} 
 		}); 
 		
-		// readMessage thread 
+		// Hilo para leer mensajes
 		Thread readMessage = new Thread(new Runnable() 
 		{ 
 			@Override
@@ -53,9 +52,9 @@ public class Client
 
 				while (true) { 
 					try { 
-						// read the message sent to this client 
-						String msg = dis.readUTF(); 
-						System.out.println(msg); 
+						// Lee el mensaje enviado a este cliente (Se muestra por consola)
+						String message = inStream.readUTF(); 
+						System.out.println(message); 
 					} catch (IOException e) { 
 
 						e.printStackTrace(); 

@@ -1,62 +1,58 @@
 package sockets;
 
-// Java implementation of  Server side 
-// It contains two classes : Server and ClientHandler 
-// Save file as Server.java 
+//Lado del Servidor
   
 import java.io.*; 
 import java.util.*; 
 import java.net.*; 
   
-// Server class 
+// Clase Servidor
 public class Server  
 { 
   
-    // Vector to store active clients 
+    // Vector para almacenar los usuarios activos
     static Vector<ClientHandler> ar = new Vector<>(); 
       
-    // counter for clients 
+    // Contador de clientes
     static int i = 0; 
   
     public static void main(String[] args) throws IOException  
     { 
-        // server is listening on port 1234 
-        ServerSocket ss = new ServerSocket(1234); 
+        // Server escuchará en el puerto 1234
+        ServerSocket serverSocket = new ServerSocket(1234); 
           
         Socket s; 
           
-        // running infinite loop for getting 
-        // client request 
+        // Corre en loop infinito para escuchar solicitudes de clientes
+
         while (true)  
         { 
-            // Accept the incoming request 
-            s = ss.accept(); 
+            // Aceptar la solicitud entrante
+            s = serverSocket.accept(); 
   
-            System.out.println("New client request received : " + s); 
+            System.out.println("Se ha conectado un cliente : " + s); 
               
-            // obtain input and output streams 
-            DataInputStream dis = new DataInputStream(s.getInputStream()); 
-            DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
+            // Se declaran los flujos de entrada y salida para trabajar con ellos
+            DataInputStream inStream = new DataInputStream(s.getInputStream()); 
+            DataOutputStream outStream = new DataOutputStream(s.getOutputStream()); 
               
-            System.out.println("Creating a new handler for this client..."); 
+            // Se crea un nuevo manejador de clientes para encargarse de este. 
+            ClientHandler mtch = new ClientHandler(s,"client " + i, inStream, outStream); 
   
-            // Create a new handler object for handling this request. 
-            ClientHandler mtch = new ClientHandler(s,"client " + i, dis, dos); 
-  
-            // Create a new Thread with this object. 
+            // Crear un nuevo hilo con este objeto 
             Thread t = new Thread(mtch); 
               
-            System.out.println("Adding this client to active client list"); 
+            System.out.println("Se ingresa a la lista de usuarios activos"); 
   
-            // add this client to active clients list 
+            // Se agrega a la lista de usuarios activos
             ar.add(mtch); 
   
-            // start the thread. 
+            // Se inicia el hilo
             t.start(); 
   
-            // increment i for new client. 
-            // i is used for naming only, and can be replaced 
-            // by any naming scheme 
+            // Se suma 1 al conteo de usuarios
+            // se usa sólo para nombrar usuarios, pero puede ser reemplazado
+            // por cualquier esquema de nombres
             i++; 
   
         } 
