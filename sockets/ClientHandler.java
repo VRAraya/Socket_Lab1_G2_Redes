@@ -3,6 +3,7 @@ package sockets;
 import java.io.*; 
 import java.util.*; 
 import java.net.*; 
+import java.text.*;
 
 // Clase Manejador de cliente 
 class ClientHandler implements Runnable  
@@ -35,34 +36,32 @@ class ClientHandler implements Runnable
                 received = inStream.readUTF(); 
                   
                 System.out.println(received); 
-                  
+
                 if(received.equals("Salir")){ 
-                    this.isloggedin=false; 
-                    this.s.close(); 
-                    break; 
-                } 
-                  
-                // Rompe el string en dos partes, mensaje y receptor
+                  this.isloggedin=false; 
+                  this.s.close(); 
+                  break; 
+                }
+
+                // break the string into message and recipient part 
                 StringTokenizer st = new StringTokenizer(received, "#"); 
                 String MsgToSend = st.nextToken(); 
                 String recipient = st.nextToken(); 
-  
-                // Buscar el receptor dentro de los usuarios activos
-                // ar es el vector donde se guardan los usuarios activos
+
+                // Buscar todos los usuarios activos en el vector ar,
+                // y envía el mensaje a todos ellos.
                 for (ClientHandler mc : Server.ar)  
                 { 
                     // si el receptor es encontrado y está conectado, se escribe en su flujo de salida
-                    if (mc.name.equals(recipient) && mc.isloggedin==true)  
+                    if (mc.isloggedin==true)  
                     { 
-                        mc.outStream.writeUTF(this.name+" : "+MsgToSend); 
-                        break; 
+                      mc.outStream.writeUTF(this.name+" : "+MsgToSend); 
+                      break; 
                     } 
                 } 
             } catch (IOException e) { 
-                  
                 e.printStackTrace(); 
             } 
-              
         } 
         try
         { 
