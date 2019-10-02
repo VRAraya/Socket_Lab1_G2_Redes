@@ -1,31 +1,71 @@
 package sockets;
 
-import java.io.*;
-//import java.net.*;
+// Java implementation for multithreaded chat client 
+// Save file as Client.java 
 
-public class Client {
-  public static void main(String[] args) throws IOException {
-    int inputPort;
-    String inputIp;
-    String nickName;
-    Console console = System.console();
+import java.io.*; 
+import java.net.*; 
+import java.util.Scanner; 
 
-    if(console == null) {
-      System.err.println("No hay consola.");
-      System.exit(1);
-    }
+public class Client 
+{ 
+	final static int ServerPort = 1234; 
 
-    console.printf("Configuración de conexión a servidor \n");
-    console.printf("Introduzca la IP del servidor donde se conectará: \n");
-    inputIp = console.readLine();
+	public static void main(String args[]) throws UnknownHostException, IOException 
+	{ 
+		Scanner scn = new Scanner(System.in); 
+		
+		// getting localhost ip 
+		InetAddress ip = InetAddress.getByName("localhost"); 
+		
+		// establish the connection 
+		Socket s = new Socket(ip, ServerPort); 
+		
+		// obtaining input and out streams 
+		DataInputStream dis = new DataInputStream(s.getInputStream()); 
+		DataOutputStream dos = new DataOutputStream(s.getOutputStream()); 
 
-    console.printf("Indique el puerto: \n");
-    inputPort = Integer.parseInt(console.readLine());
+		// sendMessage thread 
+		Thread sendMessage = new Thread(new Runnable() 
+		{ 
+			@Override
+			public void run() { 
+				while (true) { 
 
-    console.printf("Ingrese su nickname: \n");
-    nickName = console.readLine();
+					// read the message to deliver. 
+					String msg = scn.nextLine(); 
+					
+					try { 
+						// write on the output stream 
+						dos.writeUTF(msg); 
+					} catch (IOException e) { 
+						e.printStackTrace(); 
+					} 
+				} 
+			} 
+		}); 
+		
+		// readMessage thread 
+		Thread readMessage = new Thread(new Runnable() 
+		{ 
+			@Override
+			public void run() { 
 
-    HiloClient hc=new HiloClient(inputIp, inputPort, nickName);
-    hc.start();
-  }
-}
+				while (true) { 
+					try { 
+						// read the message sent to this client 
+						String msg = dis.readUTF(); 
+						System.out.println(msg); 
+					} catch (IOException e) { 
+
+						e.printStackTrace(); 
+					} 
+				} 
+			} 
+		}); 
+
+		sendMessage.start(); 
+		readMessage.start(); 
+
+	} 
+} 
