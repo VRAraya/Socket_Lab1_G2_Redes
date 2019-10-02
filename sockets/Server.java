@@ -21,8 +21,7 @@ public class Server {
     try {
       serverSocket = new ServerSocket(inputPort);
       console.printf("Socket del servidor creado. \n");
-    } 
-    catch (IOException e) {
+    } catch (IOException e) {
       System.err.println("Could not listen on port: "+ inputPort);
       System.exit(1);
     }
@@ -32,7 +31,7 @@ public class Server {
       clientSocket = serverSocket.accept();
       HiloServer hs = new HiloServer(clientSocket);
       hs.start();
-      // console.printf("Cliente conectado. \n");
+      console.printf("Cliente conectado. \n");
     }
   }
 }

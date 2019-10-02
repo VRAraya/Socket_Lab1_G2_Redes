@@ -6,7 +6,8 @@ import java.io.*;
 public class Client {
   public static void main(String[] args) throws IOException {
     int inputPort;
-    String inputIP;
+    String inputIp;
+    String nickName;
     Console console = System.console();
 
     if(console == null) {
@@ -15,13 +16,16 @@ public class Client {
     }
 
     console.printf("Configuración de conexión a servidor \n");
-    console.printf("Por favor introduzca la IP del servidor donde se conectará: \n");
-    inputIP = console.readLine();
+    console.printf("Introduzca la IP del servidor donde se conectará: \n");
+    inputIp = console.readLine();
 
-    console.printf("Por favor introduzca el puerto: \n");
+    console.printf("Indique el puerto: \n");
     inputPort = Integer.parseInt(console.readLine());
 
-    HiloClient hc=new HiloClient(inputIP, inputPort);
+    console.printf("Ingrese su nickname: \n");
+    nickName = console.readLine();
+
+    HiloClient hc=new HiloClient(inputIp, inputPort, nickName);
     hc.start();
   }
 }

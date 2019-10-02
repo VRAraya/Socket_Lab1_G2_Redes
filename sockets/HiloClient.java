@@ -1,14 +1,17 @@
 package sockets;
 import java.io.*;
 import java.net.*;
+import java.util.Date;
 
 public class HiloClient extends Thread {
-  private String host = null;
+  private String ip = null;
   private Integer port = null;
+  private String nick = null;
   
-  public HiloClient(String host, Integer port) {
-    this.host = host;
+  public HiloClient(String ip, Integer port, String nick) {
+    this.ip = ip;
     this.port = port;
+    this.nick = nick;
   }
   
   public void run() {
@@ -21,21 +24,32 @@ public class HiloClient extends Thread {
     }
 
     try {
-      String str;
+      clientSocket = new Socket(ip, port);
+      String message;
+      SendingPackage data = new SendingPackage();
+      Date date = new Date();
+      data.setNick(nick);
+      data.setIp(ip);
+      ObjectOutputStream dataPackage = new ObjectOutputStream(clientSocket.getOutputStream());
+
+
       do {
-        clientSocket = new Socket(host, port);
         console.printf("Escribe un mensaje: \n");
-        str = console.readLine();
-  
-        DataOutputStream outputData = new DataOutputStream(clientSocket.getOutputStream());
-        outputData.writeUTF(str);
-        outputData.close();
-        clientSocket.close();
-      } while (!str.equals("Salir"));
+        message = console.readLine();
+
+        data.setMessage(message);
+        data.setDate(date);
+        dataPackage.writeObject(data);
+
+      } while (!message.equals("Salir"));
+
+      clientSocket.close();
+      System.out.println("Cliente cerró conexión");
 
     } catch (UnknownHostException e) {
       e.printStackTrace();
     } catch (IOException e) {
+      System.out.println("[ERROR]: ");
       System.out.println(e.getMessage());
     }
   }

@@ -1,6 +1,9 @@
 package sockets;
 import java.io.*;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class HiloServer extends Thread {
   private Socket clientSocket = null;
@@ -10,17 +13,28 @@ public class HiloServer extends Thread {
   }
 
   public void run() {
+    DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+  
     // PrintWriter out=null;
     // BufferedReader in=null;
     // long ini = System.currentTimeMillis();
     try {
-      DataInputStream inputData = new DataInputStream(clientSocket.getInputStream());
+      String nick, ip, message;
+      Date date = new Date();
+      SendingPackage packageReceived;
 
-      String messageText = inputData.readUTF();
+      ObjectInputStream dataPackage = new ObjectInputStream(clientSocket.getInputStream());
+      packageReceived = (SendingPackage) dataPackage.readObject();
+      
+      nick = packageReceived.getNick();
+      ip=packageReceived.getIp();
+      message=packageReceived.getMessage();
 
-      System.out.println(messageText + "\n");
+      System.out.print("["+hourdateFormat.format(date)+"] "+ nick +": ");
+      System.out.println(message + "\n");
 
       clientSocket.close();
+
       // out = new PrintWriter(clientSocket.getOutputStream(), true);
       // in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       // String inputLine, outputLine;
@@ -37,8 +51,7 @@ public class HiloServer extends Thread {
       //   out.close();
       // if (in!=null)
       //   in.close();
-      // clientSocket.close();
-    } catch (IOException e) {
+    } catch (IOException | ClassNotFoundException e) {
       e.printStackTrace();
     }
     // long fin = System.currentTimeMillis();
