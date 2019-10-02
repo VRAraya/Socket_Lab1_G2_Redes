@@ -43,11 +43,11 @@ class ClientHandler implements Runnable
                   break; 
                 }
 
-                // break the string into message and recipient part 
+                // Quiebra el string en el mensaje y el recipient
                 StringTokenizer st = new StringTokenizer(received, "#"); 
                 String MsgToSend = st.nextToken(); 
                 String recipient = st.nextToken(); 
-
+                
                 // Buscar todos los usuarios activos en el vector ar,
                 // y envía el mensaje a todos ellos.
                 for (ClientHandler mc : Server.ar)  

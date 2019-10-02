@@ -21,6 +21,7 @@ public class Server
     Date date = new Date();
     DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
     
+    //Solicita puerto a escuchar
     System.out.println("Configuración del servidor");
     System.out.println("Ingrese el puerto a escuchar: ");
     Integer port = scn.nextInt();

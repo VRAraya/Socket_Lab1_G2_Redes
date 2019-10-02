@@ -52,7 +52,7 @@ public class Client
                 String msg = scn.nextLine(); 
                   
                 try { 
-                    // write on the output stream 
+                    // Escribiendo en el flujo
                     outStream.writeUTF(msg); 
                 } catch (IOException e) { 
                     e.printStackTrace(); 
