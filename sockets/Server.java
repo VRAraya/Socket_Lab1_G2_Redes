@@ -17,24 +17,32 @@ public class Server
   static int i = 0;
   public static void main(String[] args) throws IOException  
   {
-    Scanner scn = new Scanner(System.in);
+    Console console = System.console();
+		
+    if (console == null) {
+      System.err.println("No hay consola.");
+      System.exit(1);
+    }
+		
+		// console.printf("Introducir un numero: ");
+		// String dato = console.readLine();
     Date date = new Date();
     DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
     
     //Solicita puerto a escuchar
-    System.out.println("Configuración del servidor");
-    System.out.println("Ingrese el puerto a escuchar: ");
-    Integer port = scn.nextInt();
+    console.printf("Configuración del servidor\n");
+    console.printf("Ingrese el puerto a escuchar: ");
+    Integer port = Integer.parseInt(console.readLine());
 
     // Server escuchará en el puerto port
     ServerSocket serverSocket=null;
 
     try {
       serverSocket = new ServerSocket(port);
-      System.out.print("["+ hourdateFormat.format(date) +"]: ");
-      System.out.println("Socket del servidor creado. \n");
+      console.printf("["+ hourdateFormat.format(date) +"] ");
+      console.printf("Socket del servidor creado. \n");
     } catch (IOException e) {
-      System.err.println("No se puede escuchar el puerto "+ port);
+      console.printf("No se puede escuchar el puerto "+ port);
       System.exit(1);
     }
 
@@ -46,16 +54,31 @@ public class Server
       // Aceptar la solicitud entrante
       s = serverSocket.accept();
 
-      //Se notifica dentro del servidor que se ha conectado un usuario
-      System.out.print("["+ hourdateFormat.format(date) +"]: ");
-      System.out.println("Se ha conectado un cliente : " + s); 
-      
       // Se declaran los flujos de entrada y salida para trabajar con ellos
       DataInputStream inStream = new DataInputStream(s.getInputStream()); 
       DataOutputStream outStream = new DataOutputStream(s.getOutputStream()); 
 
+      // Recibe el nickname del cliente
+      String name = null;
+      try {
+        name = inStream.readUTF();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+      //Se notifica dentro del servidor que se ha conectado un usuario
+      console.printf("["+ hourdateFormat.format(date) +"] " + "Se ha conectado " + name + "\n");
+
+      //Se notifica a todos los usuarios activos que un cliente se ha conectado
+      for (ClientHandler mc : Server.ar) {
+        if (mc.isloggedin==true) {
+          mc.outStream.writeUTF("["+ hourdateFormat.format(date) +"] " + name + " se ha conectado.\n");
+          break;
+        }
+      }
+
       // Se crea un nuevo manejador de clientes para encargarse de este. 
-      ClientHandler mtch = new ClientHandler(s,"client " + i, inStream, outStream); 
+      ClientHandler mtch = new ClientHandler(s, name, inStream, outStream); 
   
       // Crear un nuevo hilo con este objeto 
       Thread t = new Thread(mtch);
@@ -65,7 +88,7 @@ public class Server
   
       // Se inicia el hilo
       t.start(); 
-  
+
       // Se suma 1 al conteo de usuarios
       // se usa sólo para nombrar usuarios, pero puede ser reemplazado
       // por cualquier esquema de nombres

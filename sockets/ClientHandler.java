@@ -7,70 +7,78 @@ import java.text.*;
 
 // Clase Manejador de cliente 
 class ClientHandler implements Runnable  
-{ 
-    Scanner scn = new Scanner(System.in); 
-    private String name; 
-    final DataInputStream inStream; 
-    final DataOutputStream outStream; 
-    Socket s; 
-    boolean isloggedin; 
-      
-    // constructor 
-    public ClientHandler(Socket s, String name, DataInputStream inStream, DataOutputStream outStream) { 
-        this.inStream = inStream; 
-        this.outStream = outStream; 
-        this.name = name; 
-        this.s = s; 
-        this.isloggedin=true; 
-    } 
-  
-    @Override
-    public void run() { 
-  
-        String received; 
-        while (true)  
-        { 
-            try
-            { 
-                // Recibe el string
-                received = inStream.readUTF(); 
-                  
-                System.out.println(received); 
+{
+  private String name; 
+  final DataInputStream inStream; 
+  final DataOutputStream outStream; 
+  Socket s; 
+  boolean isloggedin;
+  Date date = new Date();
+  DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
 
-                if(received.equals("Salir")){ 
-                  this.isloggedin=false; 
-                  this.s.close(); 
-                  break; 
-                }
+  // constructor 
+  public ClientHandler(Socket s, String name, DataInputStream inStream, DataOutputStream outStream) { 
+    this.inStream = inStream; 
+    this.outStream = outStream; 
+    this.name = name; 
+    this.s = s; 
+    this.isloggedin=true;
+  }
+  
+  @Override
+  public void run() {
+    Console console = System.console();
 
-                // Quiebra el string en el mensaje y el recipient
-                StringTokenizer st = new StringTokenizer(received, "#"); 
-                String MsgToSend = st.nextToken(); 
-                String recipient = st.nextToken(); 
-                
-                // Buscar todos los usuarios activos en el vector ar,
-                // y envía el mensaje a todos ellos.
-                for (ClientHandler mc : Server.ar)  
-                { 
-                    // si el receptor es encontrado y está conectado, se escribe en su flujo de salida
-                    if (mc.isloggedin==true)  
-                    { 
-                      mc.outStream.writeUTF(this.name+" : "+MsgToSend); 
-                      break; 
-                    } 
-                } 
-            } catch (IOException e) { 
-                e.printStackTrace(); 
-            } 
-        } 
-        try
-        { 
-            // Cerrando los recursos
-            this.inStream.close(); 
-            this.outStream.close(); 
-              
-        }catch(IOException e){ 
-            e.printStackTrace(); 
-        } 
-    } 
-} 
+    if (console == null) {
+      System.err.println("No hay consola.");
+      System.exit(1);
+    }
+
+    String received;
+    while (true) {
+      try
+      {
+        // Recibe el string
+        received = inStream.readUTF();
+        console.printf("["+ hourdateFormat.format(date) +"] "+ name + ": " + received+ "\n");
+
+        if (received.equals("Salir")) {
+          
+          //Se notifica dentro del servidor que se ha desconectado un usuario
+          this.isloggedin=false;
+          this.s.close();
+          console.printf("["+ hourdateFormat.format(date) +"] " + name + " se ha desconectado.\n");
+
+          //Se notifica a todos los usuarios activos que un cliente se ha desconectado
+          for (ClientHandler mc : Server.ar) {
+            if (mc.isloggedin==true) {
+              mc.outStream.writeUTF("["+ hourdateFormat.format(date) +"] " + name + "se ha desconectado.\n");
+              break;
+            }
+          }
+
+          break;
+        }
+
+        // Buscar todos los usuarios activos en el vector ar,
+        // y envía el mensaje a todos ellos.
+        for (ClientHandler mc : Server.ar) {
+          // si el receptor es encontrado y está conectado, se escribe en su flujo de salida
+          if (!mc.name.equals(name) && mc.isloggedin==true) {
+            mc.outStream.writeUTF("["+ hourdateFormat.format(date) +"] "+ name +" : "+ received+"\n");
+            break;
+          }
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    try {
+      // Cerrando los recursos
+      this.inStream.close();
+      this.outStream.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+}

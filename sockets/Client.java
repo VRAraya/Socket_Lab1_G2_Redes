@@ -4,52 +4,66 @@ package sockets;
 
 import java.io.*; 
 import java.net.*; 
-import java.util.*; 
 import java.text.*;
 
 public class Client 
 { 
 	public static void main(String args[]) throws UnknownHostException, IOException 
 	{ 
-    Scanner scn = new Scanner(System.in);
+    Console console = System.console();
+
+    if (console == null) {
+      System.err.println("No hay consola.");
+      System.exit(1);
+    }
+
     DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
 
-    System.out.println("---Bienvenido a la sala de chat--- ");
+    console.printf("---Bienvenido a la sala de chat--- \n");
 
     // Obteniendo la ip
-    System.out.print("Ingrese la ip del servidor de la sala de chat: ");
-    String ipServer = scn.nextLine();
+    console.printf("Ingrese la ip del servidor de la sala de chat: ");
+    String ipServer = console.readLine();
 
     // Obteniendo el puerto de envío
     System.out.print("Ingrese el puerto: ");
-    Integer portServer = scn.nextInt();
-		
+    Integer portServer = Integer.parseInt(console.readLine());
+
     // Estableciendo la conexión
     Socket s = null; 
     try {
       s = new Socket(ipServer, portServer);
-      System.out.println("Socket conectado.");
+      console.printf("Socket conectado.\n");
     } catch (IOException e) {
       System.err.println("No se puede construir el socket hacia el server"+ipServer+"con puerto "+ portServer);
       System.exit(1);
     }
-    System.out.print("Ingrese su nickname para entrar al chat: ");
-    String nick = scn.next();
-    System.out.println("---CHAT---");
-		
-		// Se declaran los flujos de entrada y salida
+
+    // Se declaran los flujos de entrada y salida
     DataInputStream inStream = new DataInputStream(s.getInputStream()); 
     DataOutputStream outStream = new DataOutputStream(s.getOutputStream()); 
 
-		// Hilo para enviar mensajes
+    // Se solicita ingresar un nickname para identificación dentro del chat
+    console.printf("Ingrese su nickname para entrar al chat: ");
+    String nick = console.readLine();
+    try { 
+      // Escribiendo en el flujo
+      outStream.writeUTF(nick); 
+    } catch (IOException e) { 
+      e.printStackTrace(); 
+    }
+
+    console.printf("---CHAT---\n");
+
+    // Hilo para enviar mensajes
     Thread sendMessage = new Thread(new Runnable()  
     { 
         @Override
         public void run() { 
             while (true) { 
-
                 // Lee el mensaje a enviar
-                String msg = scn.nextLine(); 
+                console.printf("Escribe tu mensaje: ");
+                String msg = console.readLine(); 
                   
                 try { 
                     // Escribiendo en el flujo
@@ -70,7 +84,7 @@ public class Client
           try {
             // read the message sent to this client
             String msg = inStream.readUTF();
-            System.out.println(msg);
+            console.printf(msg);
           } catch (IOException e) {
             e.printStackTrace();
           }

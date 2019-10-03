@@ -6,16 +6,16 @@
   "configurations": [
     {
       "type": "java",
-      "name": "CodeLens (Launch) - Client",
+      "name": "CodeLens (Launch) - Server",
       "request": "launch",
-      "mainClass": "sockets.Client",
+      "mainClass": "sockets.Server",
       "projectName": "Lab_1_b233a6e"
     },
     {
       "type": "java",
-      "name": "CodeLens (Launch) - Server",
+      "name": "CodeLens (Launch) - Client",
       "request": "launch",
-      "mainClass": "sockets.Server",
+      "mainClass": "sockets.Client",
       "projectName": "Lab_1_b233a6e"
     },
     {
@@ -29,6 +29,12 @@
       "name": "Debug (Launch)-EchoClient",
       "request": "launch",
       "mainClass": "echoserver.EchoClient"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-EchoServer",
+      "request": "launch",
+      "mainClass": "echoserver.EchoServer"
     }
   ]
 }
