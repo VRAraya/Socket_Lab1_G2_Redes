@@ -1,11 +1,12 @@
 package sockets;
 
 //Lado del Servidor
-  
-import java.io.*; 
-import java.util.*; 
-import java.net.*; 
-import java.text.*;
+
+import java.io.*;
+import java.util.*;
+import java.net.*;
+import java.time.LocalDateTime;
+import java.time.format.*;
   
 // Clase Servidor
 public class Server
@@ -18,16 +19,13 @@ public class Server
   public static void main(String[] args) throws IOException  
   {
     Console console = System.console();
-		
+
     if (console == null) {
       System.err.println("No hay consola.");
       System.exit(1);
     }
-		
-		// console.printf("Introducir un numero: ");
-		// String dato = console.readLine();
-    Date date = new Date();
-    DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
     
     //Solicita puerto a escuchar
     console.printf("Configuración del servidor\n");
@@ -37,10 +35,11 @@ public class Server
     // Server escuchará en el puerto port
     ServerSocket serverSocket=null;
 
+    // Se intenta realizar la conexion
     try {
       serverSocket = new ServerSocket(port);
-      console.printf("["+ hourdateFormat.format(date) +"] ");
-      console.printf("Socket del servidor creado. \n");
+      console.printf("["+ dtf.format(LocalDateTime.now()) +"] ");
+      console.printf("Servidor escuchando en el puerto "+ port +"\n");
     } catch (IOException e) {
       console.printf("No se puede escuchar el puerto "+ port);
       System.exit(1);
@@ -64,15 +63,16 @@ public class Server
         name = inStream.readUTF();
       } catch (IOException e) {
         e.printStackTrace();
+        System.exit(1);
       }
 
       //Se notifica dentro del servidor que se ha conectado un usuario
-      console.printf("["+ hourdateFormat.format(date) +"] " + "Se ha conectado " + name + "\n");
+      console.printf("["+ dtf.format(LocalDateTime.now()) +"] " + "Se ha conectado " + name + " con IP " + s.getInetAddress() + "\n");
 
       //Se notifica a todos los usuarios activos que un cliente se ha conectado
       for (ClientHandler mc : Server.ar) {
         if (mc.isloggedin==true) {
-          mc.outStream.writeUTF("["+ hourdateFormat.format(date) +"] " + name + " se ha conectado.\n");
+          mc.outStream.writeUTF("["+ dtf.format(LocalDateTime.now()) +"] " + "Se ha conectado "+ name + " con IP"+ s.getInetAddress() +"\n");
           break;
         }
       }
@@ -90,8 +90,6 @@ public class Server
       t.start(); 
 
       // Se suma 1 al conteo de usuarios
-      // se usa sólo para nombrar usuarios, pero puede ser reemplazado
-      // por cualquier esquema de nombres
       i++; 
 
     }

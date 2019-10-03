@@ -17,8 +17,6 @@ public class Client
       System.exit(1);
     }
 
-    DateFormat hourdateFormat = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-
     console.printf("---Bienvenido a la sala de chat--- \n");
 
     // Obteniendo la ip
