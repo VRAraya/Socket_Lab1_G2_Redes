@@ -22,17 +22,17 @@ public class Client
     console.printf("Ingrese la ip del servidor de la sala de chat: ");
     String ipServer = console.readLine();
 
-    // Obteniendo el puerto de envío
+    // Obteniendo el puerto de envio
     System.out.print("Ingrese el puerto: ");
     Integer portServer = Integer.parseInt(console.readLine());
 
-    // Estableciendo la conexión
+    // Estableciendo la conexion
     Socket s = null; 
     try {
       s = new Socket(ipServer, portServer);
       console.printf("Socket conectado.\n");
     } catch (IOException e) {
-      System.err.println("No se puede construir el socket hacia el server"+ipServer+"con puerto "+ portServer);
+      System.err.println("No se puede construir el socket hacia el server "+ipServer+" con puerto "+ portServer);
       System.exit(1);
     }
 
@@ -40,7 +40,7 @@ public class Client
     DataInputStream inStream = new DataInputStream(s.getInputStream()); 
     DataOutputStream outStream = new DataOutputStream(s.getOutputStream()); 
 
-    // Se solicita ingresar un nickname para identificación dentro del chat
+    // Se solicita ingresar un nickname para identificacion dentro del chat
     console.printf("Ingrese su nickname para entrar al chat: ");
     String nick = console.readLine();
     try { 
