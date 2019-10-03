@@ -69,7 +69,7 @@ public class Client
                     // Escribiendo en el flujo
                     outStream.writeUTF(msg); 
                 } catch (IOException e) { 
-                    e.printStackTrace(); 
+                    System.exit(1);
                 } 
             } 
         } 
@@ -82,11 +82,11 @@ public class Client
       public void run() { 
         while (true) {
           try {
-            // read the message sent to this client
+            // Leer el mensaje recibido
             String msg = inStream.readUTF();
             console.printf(msg);
           } catch (IOException e) {
-            e.printStackTrace();
+            System.exit(1);
           }
         }
       }
