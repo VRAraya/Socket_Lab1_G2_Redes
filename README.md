@@ -1,7 +1,8 @@
-# Lab_Redes
-Recordatorio que empieza el día 03/10, ojala agreguen materiales que nos sirva de ayuda anticipadamente. 
+# Socket_Lab1_G2_Redes
 
-## Construir sistema mensajería vía socket, con 1 servidor y varios clientes, aqui va el enunciado: 
+Socket: Laboratorio 1 del Grupo 2 de Redes y Comunicación de Datos - UTEM
+
+## Enunciado: 
 
 Construir en los lenguajes indicados un sistema de Chat en el cual exista un servidor al que se puedan conectar varios clientes. 
 Al ejecutar el programa Servidor, deberá pedir el puerto (y la dirección IP de la interfaz de red en caso de ser varias) en el cual escuchará las conexiones (donde se abrirá el socket). 
